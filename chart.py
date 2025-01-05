@@ -23,7 +23,7 @@ def ChartView():
     with col1:
         st.markdown(
             f"""
-        <div style="background-color:  #c2d6d6; padding: 10px; border-radius: 8px; text-align: center;">
+        <div style="background-color:  #c2d6d6; border-radius: 8px; text-align: center;">
         <h4>Total Number of Movie, Film and Video</h4>
         <p style = "font-size:30px; font-weight: bold;">{df.shape[0]} </p>
         </div>
@@ -40,7 +40,7 @@ def ChartView():
         def Card(title):
             st.markdown(
                 f"""
-            <div style="background-color:  #c2d6d6; padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="background-color:  #c2d6d6; border-radius: 8px; text-align: center;">
             <h4>{title}</h4>
             <p style = "font-size:30px; font-weight: bold;">{df_selection.shape[0]} </p>
             </div>
@@ -54,3 +54,10 @@ def ChartView():
             Card('Total Number of Film')
         else:
             Card('Total Number of Video')
+
+    selected_columns = ['primary_title','runtime_minutes']
+    result = df_selection[selected_columns]
+    sorted_df = result.sort_values(by = 'runtime_minutes', ascending= False)
+    sorted_df.reset_index(drop= True, inplace= True)
+    sorted_df.index = sorted_df.index + 1
+    st.write(sorted_df.head(10))

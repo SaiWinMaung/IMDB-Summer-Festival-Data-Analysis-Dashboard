@@ -36,6 +36,3 @@ def TableView():
         for col in df.columns:
             st.text(col)
 
-    drama  = df['genres'].str.contains('Drama')
-
-    st.write(drama)
