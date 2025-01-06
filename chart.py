@@ -55,9 +55,20 @@ def ChartView():
         else:
             Card('Total Number of Video')
 
+
+    st.divider()
     selected_columns = ['primary_title','runtime_minutes']
     result = df_selection[selected_columns]
-    sorted_df = result.sort_values(by = 'runtime_minutes', ascending= False)
-    sorted_df.reset_index(drop= True, inplace= True)
-    sorted_df.index = sorted_df.index + 1
-    st.write(sorted_df.head(10))
+    max_or_min = st.radio('Please choose Maximum or Minimum runtime', ['max', 'min'], horizontal= True)
+
+    if max_or_min == 'max':
+        sorted_df = result.sort_values(by = 'runtime_minutes', ascending= False)
+        sorted_df.reset_index(drop= True, inplace= True)
+        sorted_df.index = sorted_df.index + 1
+        st.write(sorted_df.head(10))
+
+    else :
+        sorted_df = result.sort_values(by = 'runtime_minutes',)
+        sorted_df.reset_index(drop= True, inplace= True)
+        sorted_df.index = sorted_df.index + 1
+        st.write(sorted_df.head(10))
