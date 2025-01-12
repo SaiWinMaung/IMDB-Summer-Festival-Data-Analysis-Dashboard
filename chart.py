@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from io import BytesIO
+import plotly.express as px
 
 
 def ChartView():
@@ -59,6 +60,7 @@ def ChartView():
             Card("Total Number of Video")
 
     st.divider()
+    st.markdown("## Top 10 Maximum or Minimum Movie, Film and Video")
     selected_columns = ["primary_title", "runtime_minutes"]
     result = df_selection[selected_columns]
     max_or_min = st.radio(
@@ -69,7 +71,7 @@ def ChartView():
 
         def render_mini_bar_chart(value, max_value, width=80, height=5):
             fig, ax = plt.subplots(figsize=(width / 80, height / 80))
-            ax.barh([0], [value], color="blue", height=0.8)
+            ax.barh([0], [value], color="#c2d6d6", height=0.8)
             ax.set_xlim(0, max_value)
             ax.axis("off")
             buffer = BytesIO()
@@ -78,33 +80,46 @@ def ChartView():
             buffer.seek(0)
             return buffer
 
-        sorted_df = result.sort_values(by = 'runtime_minutes', ascending= False)
+        sorted_df = result.sort_values(by="runtime_minutes", ascending=False)
 
         top_10_df = sorted_df.head(10)
-        max_value = top_10_df['runtime_minutes'].max()
+        max_value = top_10_df["runtime_minutes"].max()
 
-        title1, title2, title3 =st.columns([2, 1, 3])
-        title1.markdown(f'''
-                <h3 style =" text-align: center;"> Title</h3>''', unsafe_allow_html= True)
-        title2.markdown(f'''
-                <h3 style =" text-align: center;"> Minutes</h3>''', unsafe_allow_html= True)
-        title3.markdown(f'''
-                <h3 style =" text-align: center;"> Bar Chart</h3>''', unsafe_allow_html= True)
+        title1, title2, title3 = st.columns([2, 1, 3])
+        title1.markdown(
+            f"""
+                <h3 style =" text-align: center;"> Title</h3>""",
+            unsafe_allow_html=True,
+        )
+        title2.markdown(
+            f"""
+                <h3 style =" text-align: center;"> Minutes</h3>""",
+            unsafe_allow_html=True,
+        )
+        title3.markdown(
+            f"""
+                <h3 style =" text-align: center;"> Bar Chart</h3>""",
+            unsafe_allow_html=True,
+        )
         for index, row in top_10_df.iterrows():
             text = row["primary_title"]
             value = row["runtime_minutes"]
             bar_chart = render_mini_bar_chart(value, max_value)
-            
+
             # Render the row with text, value, and bar chart
             col1, col2, col3 = st.columns([2, 1, 2])
             col1.write(text)
-            col2.write(value)
+            col2.markdown(
+                f"""<p style = "font-color: black;">{value}</p> """,
+                unsafe_allow_html=True,
+            )
             col3.image(bar_chart, use_column_width=True)
 
     else:
+
         def render_mini_bar_chart(value, max_value, width=80, height=5):
             fig, ax = plt.subplots(figsize=(width / 80, height / 80))
-            ax.barh([0], [value], color="blue", height=0.8)
+            ax.barh([0], [value], color="#c2d6d6", height=0.8)
             ax.set_xlim(0, max_value)
             ax.axis("off")
             buffer = BytesIO()
@@ -112,25 +127,83 @@ def ChartView():
             plt.close(fig)
             buffer.seek(0)
             return buffer
+
         sorted_df = result.sort_values(
             by="runtime_minutes",
         )
         top_10_df = sorted_df.head(10)
-        max_value = top_10_df['runtime_minutes'].max()
-        title1, title2, title3 =st.columns([2, 1, 3])
-        title1.markdown(f'''
-                <h3 style =" text-align: center;"> Title</h3>''', unsafe_allow_html= True)
-        title2.markdown(f'''
-                <h3 style =" text-align: center;"> Minutes</h3>''', unsafe_allow_html= True)
-        title3.markdown(f'''
-                <h3 style =" text-align: center;"> Bar Chart</h3>''', unsafe_allow_html= True)
+        max_value = top_10_df["runtime_minutes"].max()
+        title1, title2, title3 = st.columns([2, 1, 3])
+        title1.markdown(
+            f"""
+                <h3 style =" text-align: center;"> Title</h3>""",
+            unsafe_allow_html=True,
+        )
+        title2.markdown(
+            f"""
+                <h3 style =" text-align: center;"> Minutes</h3>""",
+            unsafe_allow_html=True,
+        )
+        title3.markdown(
+            f"""
+                <h3 style =" text-align: center;"> Bar Chart</h3>""",
+            unsafe_allow_html=True,
+        )
         for index, row in top_10_df.iterrows():
             text = row["primary_title"]
             value = row["runtime_minutes"]
             bar_chart = render_mini_bar_chart(value, max_value)
-            
+
             # Render the row with text, value, and bar chart
             col1, col2, col3 = st.columns([2, 1, 2])
             col1.write(text)
-            col2.write(value)
+            col2.markdown(
+                f"""
+                <p style = "font-color : red; ">{value}</p>""",
+                unsafe_allow_html=True,
+            )
             col3.image(bar_chart, use_column_width=True)
+
+    # for unique genre
+    st.divider()
+    st.markdown("## Genres with Pie Chart")
+    __, pie1, __ = st.columns([0.5, 3, 0.5])
+    with pie1:
+        df_selection["genres_List"] = df_selection["genres"].apply(
+            lambda x: [genre.strip() for genre in x.split(",")]
+        )
+
+        # Flatten all genres into a single list
+        all_genres = [
+            genre for sublist in df_selection["genres_List"] for genre in sublist
+        ]
+
+        # Get unique genres with their counts
+        genre_counts = pd.Series(all_genres).value_counts()
+        
+        top_genres = genre_counts.head(5)
+        
+        
+        fig, ax = plt.subplots(figsize=(3, 3))  # Adjust the figure size
+        wedges, texts, autotexts = ax.pie(
+            top_genres,
+            labels=None,  # Hide labels on the pie
+            autopct="%1.1f%%",  # Show percentages
+            startangle=140,
+            textprops={"fontsize": 8},
+            colors= ['#00e6ac', '#e600e6', '#00e6e6', '#00ace6', '#0073e6']
+        )
+
+        ax.legend(
+            wedges,
+            top_genres.index,
+            title="Genres",
+            loc="lower left",
+            bbox_to_anchor=(1, 0.5),
+            fontsize=6,
+        )
+
+        # Ensure the pie chart is circular
+        ax.axis("equal")
+
+        st.pyplot(fig)
