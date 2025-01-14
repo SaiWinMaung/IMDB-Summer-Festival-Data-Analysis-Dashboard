@@ -184,14 +184,14 @@ def ChartView():
         top_genres = genre_counts.head(5)
         
         
-        fig, ax = plt.subplots(figsize=(3, 3))  # Adjust the figure size
+        fig, ax = plt.subplots(figsize=(3, 3),)  # Adjust the figure size
         wedges, texts, autotexts = ax.pie(
             top_genres,
             labels=None,  # Hide labels on the pie
             autopct="%1.1f%%",  # Show percentages
             startangle=140,
             textprops={"fontsize": 8},
-            colors= ['#00e6ac', '#e600e6', '#00e6e6', '#00ace6', '#0073e6']
+            colors= ['#a3c2c2','#ff6666','#e6e600','#80d4ff','#ffd966']
         )
 
         ax.legend(
@@ -207,3 +207,12 @@ def ChartView():
         ax.axis("equal")
 
         st.pyplot(fig)
+    
+    st.divider()
+    line_df= df_selection[['year','average_rating','num_votes']]
+    st.markdown('## Rating over the year')
+    st.line_chart(line_df, x= 'year', y = 'average_rating', x_label='Year', y_label='Rating' , color= '#cccc00')
+
+    st.divider()
+    st.markdown('## Votes over the year')
+    st.line_chart(line_df, x= 'year', y = 'num_votes', x_label='Year', y_label='Votes' , color= '#cccc00')

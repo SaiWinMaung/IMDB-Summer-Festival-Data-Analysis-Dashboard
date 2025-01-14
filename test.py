@@ -1,36 +1,34 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import altair as alt
 
-# Example data
+# Sample data
 data = {
-    "Genres": ["Drama, Comedy, Action", "Action, Thriller", "Drama, Horror, Comedy"]
+    "year": [2018, 2019, 2020, 2021, 2022],
+    "rating": [7.5, 8.0, 7.0, 9.0, 9.5],
+    "votes": [1200, 1500, 1800, 2000, 2500]
 }
+
+# Create a DataFrame
 df = pd.DataFrame(data)
 
-# Split each cell in the 'Genres' column into a list of genres
-df['Genres_List'] = df['Genres'].apply(lambda x: [genre.strip() for genre in x.split(',')])
-
-# Flatten all genres into a single list
-all_genres = [genre for sublist in df['Genres_List'] for genre in sublist]
-
-# Get unique genres with their counts
-genre_counts = pd.DataFrame({'Genre': all_genres}).value_counts().reset_index(name='Count')
+# Melt the DataFrame to long format for easier plotting
+df_melted = df.melt(id_vars="year", value_vars=["rating", "votes"], var_name="Metric", value_name="Value")
 
 # Streamlit app
-st.title("Genre Analysis with Pie Chart")
+st.title("Line Chart Example")
+st.write("Displaying a line chart with `year` on the x-axis and `rating` and `votes` as two separate lines.")
 
-# Display the table of genre counts
-st.write("Genre Occurrences:")
-st.dataframe(genre_counts)
+# Plot using Altair
+chart = alt.Chart(df_melted).mark_line(point=True).encode(
+    x=alt.X("year:O", title="Year"),  # Year as an ordinal value
+    y=alt.Y("Value:Q", title="Values"),
+    color="Metric:N",  # Different lines for 'rating' and 'votes'
+    tooltip=["year", "Metric", "Value"]  # Tooltips for interactivity
+).properties(
+    width=700,
+    height=400,
+    title="Ratings and Votes Over the Years"
+)
 
-# Plot a pie chart using Plotly
-fig = px.pie(genre_counts, names='Genre', values='Count', title='Genre Distribution')
-st.plotly_chart(fig)
-
-# Search for a specific genre and filter
-search_term = st.text_input("Enter a genre to search (e.g., 'Action')")
-if search_term:
-    filtered_df = df[df['Genres_List'].apply(lambda x: search_term.strip().capitalize() in x)]
-    st.write(f"Rows containing '{search_term}':")
-    st.dataframe(filtered_df)
+st.altair_chart(chart, use_container_width=True)
