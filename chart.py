@@ -162,7 +162,7 @@ def ChartView():
                 <p style = "font-color : red; ">{value}</p>""",
                 unsafe_allow_html=True,
             )
-            col3.image(bar_chart, use_column_width=True)
+            col3.image(bar_chart, use_container_width=True)
 
     # for unique genre
     st.divider()
